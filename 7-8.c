@@ -10,45 +10,33 @@ void printpages(FILE *ifp, FILE *ofp);
 
 int main(int argc, char *argv[]) {
     FILE *fp;
-    char *prog = argv[0];
-    int linecount = 0;
-    if (argc == 1) {
-        printf("No files given");
-    } else
-        while (--argc > 0)
-            if ((fp = fopen(*++argv, "r")) == NULL) {
-                fprintf(stderr, "%s: can't open %s\n",
-                        prog, *argv);
-                exit(1);
-            } else {
-                fprintf(stdout, "\n\n\t\t\tFile: %s\n\n", *argv);
-                printpages(fp, stdout);
-                fclose(fp);
-            }
+    while (--argc > 0) //goes until there are no more files to read
+        if ((fp = fopen(*++argv, "r")) != NULL) {
+            fprintf(stdout, "\n\n\t\t\tFile: %s\n\n", *argv);
+            printpages(fp, stdout);
+            fclose(fp);
+        } else {
+            printf("Could not open the file");
+            return 1;
+        }
 
-    if (ferror(stdout)) {
-        fprintf(stderr, "%s: error writing stdout\n", prog);
-        exit(2);
-    }
-    exit(0);
+    return 0;
 }
-
-/* filecopy: copy file ifp to file ofp */
 
 void printpages(FILE *ifp, FILE *ofp)
 {
-    int c;
+    char c;
     int line = 0;
-    int pg = 1;
+    int pageNum = 1;
     while ((c = getc(ifp)) != EOF)
     {
         putc(c, ofp);
         if (c == '\n') {
-            line = line + 1;
+            ++line;
             if (line == LINESPERPAGE)
             {
-                fprintf(stdout, "\n\t\t\tPage %d End.\n\n", pg);
-                ++pg;
+                printf("\n\t\t\tPage %d End.\n\n", pageNum);
+                ++pageNum;
                 line = 0;
             }
         }
